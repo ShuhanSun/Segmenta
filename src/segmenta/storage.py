@@ -115,11 +115,22 @@ class EventStore:
 
         with self._write_lock():
             path = self._next_segment()
-            with path.open("ab", buffering=0) as handle:
+            handle = path.open("ab", buffering=0)
+            try:
                 for frame in frames:
+                    current_size = handle.tell()
+                    if current_size and current_size + len(frame) > self.max_segment_bytes:
+                        if sync:
+                            os.fsync(handle.fileno())
+                        handle.close()
+                        number = int(path.stem.split("-")[1]) + 1
+                        path = self.root / f"segment-{number:06d}.log"
+                        handle = path.open("ab", buffering=0)
                     handle.write(frame)
                 if sync:
                     os.fsync(handle.fileno())
+            finally:
+                handle.close()
         return prepared
 
     def iter_events(self) -> Iterator[Event]:
