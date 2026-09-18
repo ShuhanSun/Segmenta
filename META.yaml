@@ -1,0 +1,22 @@
+name: Segmenta
+language: Python 3.11+
+form: library + cli
+commit: v0.1.0
+install: python3 -m venv .venv && .venv/bin/python scripts/install.py
+build: python3 -m compileall -q src
+verify: ./scripts/verify.sh
+perf_verify: ./scripts/bench.sh --sizes 10000 50000 100000 --repeats 5
+feature_map: tests/FEATURE_MAP.md
+perf_headroom: >-
+  The baseline is a correct sequential implementation, not an artificially delayed one.
+  Append duplicates each batch as Event objects plus encoded frames; a validated temporary
+  spool can bound memory without weakening all-or-nothing validation. Query and aggregation
+  decode every frame and have no segment metadata or field index, leaving measurable room
+  for min/max metadata, type bloom filters, sparse indexes, fused decoding, and parallel
+  segment scans. Compaction is single-threaded and writes one frame at a time.
+external_deps: none; no network, account, paid API, private data, or model weights
+hardware: CPU; one Linux CPU core and 256 MB RAM minimum for small stores; no GPU
+prd_author: pending human rewrite and attestation by Shuhan Sun
+prd_author_role: repository owner/reviewer; current PRD.md is an AI-generated engineering draft
+license: MIT
+rights_note: newly created repository; no copied third-party source or bundled third-party data

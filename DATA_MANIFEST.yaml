@@ -1,0 +1,22 @@
+schema_version: 1
+sessions: 1
+submission_eligible_sessions: 0
+tools:
+  codex: 1
+languages:
+  python: 1
+user_locales:
+  zh: 1
+average_real_user_turns: 1.0
+minimum_required_user_turns: 3
+code_replay: embedded git history
+repository: .
+prd: PRD.md
+feature_map: tests/FEATURE_MAP.md
+agent_performance_result: docs/performance-agent-baseline.json
+human_performance_result: pending
+privacy: no credentials or private third-party code included
+eligibility_note: >-
+  Not ready for conversation-data submission. Two or more genuine follow-up user turns,
+  a human-authored PRD, and a real human-operated performance run are still required.
+
