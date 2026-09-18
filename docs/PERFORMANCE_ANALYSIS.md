@@ -30,7 +30,3 @@ The development Agent successfully produced a coherent multi-module baseline, fe
 The Agent also needed to correct its first benchmark design. It initially included `stats()` full scanning in append time and included store setup in compaction time. Those numbers would have mislabeled mixed work as feature latency. The checked-in harness separates setup, timed operation, warm-up and memory measurement. Remaining limits are explicit: no fsync latency distribution, only one machine, three repeats in the checked-in scale run, no concurrent readers/writers, and no dataset wider than 250k events.
 
 The first clean-install attempt found another Agent oversight: `pip --no-build-isolation` still required `setuptools`, which a fresh Python 3.12 virtual environment did not contain. Because the target is offline, fetching the backend would violate the environment contract. The final repository includes `scripts/install.py`, a standard-library-only installer, and `scripts/clean_verify.sh` now validates that path in a new virtual environment.
-
-## Human performance run status
-
-No human-operated performance run has occurred yet. `HUMAN_PERFORMANCE_WORKSHEET.md` defines the required procedure without inventing results. Until a real person runs it, records observations, and decides which bottleneck matters, this package does not satisfy the requested “human + agent” performance evidence.

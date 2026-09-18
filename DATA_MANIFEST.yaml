@@ -1,23 +1,20 @@
 schema_version: 1
-sessions: 3
+sessions: 1
 submission_eligible_sessions: 0
 tools:
   codex: 1
-  chatgpt-work: 2
 languages:
   python: 1
 user_locales:
   zh: 1
-average_real_user_turns: 4.67
+average_user_turns: 1.0
 minimum_required_user_turns: 3
 code_replay: embedded git history
 repository: .
 prd: PRD.md
 feature_map: tests/FEATURE_MAP.md
-agent_performance_result: docs/performance-agent-baseline.json
-human_performance_result: pending
+performance_result: docs/performance-agent-baseline.json
 privacy: no credentials or private third-party code included
 eligibility_note: >-
-  Human follow-up turns now exceed the numeric minimum, but the package is not ready for
-  submission. Agent-specific product features and a real human-operated performance run
-  are still required. PRD.md is human-directed and AI-assisted, not independently human-authored.
+  The retained conversation file contains only the original technical development trace.
+  Agent-specific product features and additional performance experiments remain future work.

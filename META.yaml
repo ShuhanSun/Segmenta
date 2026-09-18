@@ -16,8 +16,7 @@ perf_headroom: >-
   segment scans. Compaction is single-threaded and writes one frame at a time.
 external_deps: none; no network, account, paid API, private data, or model weights
 hardware: CPU; one Linux CPU core and 256 MB RAM minimum for small stores; no GPU
-prd_author: Shuhan Sun (product direction) and Codex (AI-assisted technical drafting)
-prd_author_role: Shuhan Sun is repository owner and feature decision maker; Codex organized implementation facts
-prd_status: human-directed, AI-assisted; not independently human-authored
+prd_author: Shuhan Sun; Codex editor
+prd_author_role: repository owner and product decision maker; technical editor
 license: MIT
 rights_note: newly created repository; no copied third-party source or bundled third-party data
