@@ -24,6 +24,13 @@ class RecoveryReport:
     repaired_files: tuple[str, ...]
 
 
+@dataclass(frozen=True, slots=True)
+class LocatedEvent:
+    event: Event
+    segment: str
+    next_offset: int
+
+
 class EventStore:
     """A directory-backed, checksum-framed event store.
 
@@ -116,10 +123,27 @@ class EventStore:
         return prepared
 
     def iter_events(self) -> Iterator[Event]:
+        for located in self.iter_located_events():
+            yield located.event
+
+    def iter_located_events(
+        self, *, start_segment: str | None = None, start_offset: int = 0
+    ) -> Iterator[LocatedEvent]:
+        started = start_segment is None
         for path in self._segments():
+            if not started:
+                if path.name == start_segment:
+                    started = True
+                else:
+                    continue
             with path.open("rb") as handle:
+                if path.name == start_segment:
+                    handle.seek(start_offset)
                 for frame in iter_frames(handle):
-                    yield frame.event
+                    yield LocatedEvent(frame.event, path.name, frame.next_offset)
+
+        if start_segment is not None and not started:
+            raise ValueError(f"cursor segment no longer exists: {start_segment}")
 
     def recover(self, *, repair: bool = False) -> RecoveryReport:
         files_checked = 0
@@ -167,4 +191,3 @@ class EventStore:
             "events": events,
             "bytes": sum(path.stat().st_size for path in segments),
         }
-
