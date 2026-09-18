@@ -1,79 +1,79 @@
-# Segmenta — Coding Agent 工作轨迹存储
+# Segmenta — Coding Agent Work Trace Store
 
-## 文档信息
+## Document Information
 
-- 产品负责人：Shuhan Sun
-- 对应版本：`v0.1.0` 及其后的产品定位补充
+- Product owner: Shuhan Sun
+- Applicable version: `v0.1.0` and subsequent product-scope updates
 
-## 产品是干什么的
+## Product Purpose
 
-我希望有一个统一的存储和查询工具，把原本分散在不同 Agent、不同平台、不同对话里的多轮开发工作连接起来。普通聊天记录只能留在各自的平台中，而 Git 主要保存代码结果，无法说明需求是怎么提出的、Agent 做过什么、为什么修改、测试为什么失败以及后来怎样修复。
+Segmenta provides one storage and query tool for multi-turn development work that is otherwise scattered across agents, platforms, and conversations. Chat records remain isolated in their respective platforms, while Git primarily preserves code results. Neither source alone explains how a requirement was introduced, what an agent attempted, why the code changed, why a test failed, or how the failure was corrected.
 
-Segmenta 的目标是保存完整开发轨迹，包括用户请求、Agent 回复、工具调用、代码变化、测试结果、性能数据和错误。用户以后可以按照项目和主题查找这些记录，并逐步支持不要求完全匹配关键词的离线模糊查询。
+Segmenta is intended to preserve the full development trail: user requests, agent responses, tool calls, code changes, test results, performance measurements, and errors. Users can retrieve records by project and topic, with offline approximate search planned for queries that do not exactly match stored keywords.
 
-当前仓库先完成底层事件存储。上层可以把每条消息、工具调用、测试或提交表示为结构化 JSON 事件，使用 `data` 字段保存 `project`、`topic`、`session_id`、`agent`、`role`、`text`、`commit` 等信息。Agent 专用导入器、离线混合搜索和自动脱敏是下一阶段功能，当前版本不能假装已经实现。
+The current repository implements the underlying event store first. An upper layer can represent every message, tool call, test, or commit as a structured JSON event and store fields such as `project`, `topic`, `session_id`, `agent`, `role`, `text`, and `commit` inside `data`. Agent-specific importers, offline hybrid search, and automatic redaction are planned features and are not presented as implemented in the current release.
 
-## 当前核心功能
+## Current Core Features
 
-### F1. 可靠保存开发事件
+### F1. Reliable Development Event Storage
 
-调用方可以一次写入一条或一批事件。每条事件必须包含时间、类型和 JSON 数据。系统在写入前检查整批数据；如果其中一条无效，整个批次都不写入。没有 ID 的事件会自动生成 ID，写入顺序保持不变。
+A caller can append one event or a batch of events. Every event must contain a timestamp, type, and JSON data object. Segmenta validates the complete batch before writing it. If any event is invalid, no prefix of that batch is written. Events without IDs receive generated IDs, and append order is preserved.
 
-数据按大小拆分为多个 segment 文件。每条记录带 CRC32 校验值，用来发现不完整写入或文件损坏。读取发现损坏时会明确失败；使用修复模式时，只截断第一个损坏位置之后的尾部，不修改之前已经验证的记录。
+Data is divided into size-bounded segment files. Each record contains a CRC32 checksum used to detect incomplete writes or file corruption. A normal read fails explicitly when corruption is found. Repair mode truncates only the tail beginning at the first damaged frame and leaves previously verified records unchanged.
 
-### F2. 按条件查询和分页
+### F2. Filtered Queries and Cursor Pagination
 
-用户可以按事件类型、时间范围以及 `data` 中的字段进行精确过滤，例如查询某个项目、会话、Agent 或测试状态。结果按照原始写入顺序返回。
+Users can apply exact filters by event type, time range, and fields inside `data`, such as a project, session, agent, or test status. Results are returned in original append order.
 
-结果过多时使用游标分页，每页最多 10,000 条。游标只能继续原来的查询，不能拿去执行另一组条件。压缩会改变物理文件位置，因此压缩前的游标不保证继续有效。
+Large result sets use cursor pagination with a maximum of 10,000 events per page. A cursor can continue only the query that created it. Compaction changes physical file positions, so cursors issued before compaction are not guaranteed to remain valid.
 
-当前版本只实现精确字段过滤。“按照主题、项目，支持模糊的语言描述”计划采用离线混合搜索，不依赖外部大模型、账号或随包模型权重，但这部分尚未实现。
+The current release implements exact field filtering only. The planned project-and-topic query capability will use offline hybrid search based on keywords, spelling similarity, and relevance ranking. It will not require an external language model, account, network service, or bundled model weights.
 
-### F3. 统计 Agent 工作轨迹
+### F3. Coding Agent Trace Aggregation
 
-用户可以执行 `count`、`sum`、`min`、`max` 和 `avg`，并按事件类型或 `data` 字段分组。典型用途包括统计每个 Agent 的工具调用次数、每个项目的失败测试数量，或不同任务的平均耗时。
+Users can run `count`, `sum`, `min`, `max`, and `avg` operations and group results by event type or a field inside `data`. Example uses include counting tool calls per agent, counting failed tests per project, and calculating average task duration.
 
-聚合通过顺序扫描完成，不会把所有事件同时载入内存。数值聚合会忽略缺失值、布尔值和非数值内容；除计数外，其他聚合必须指定数值字段。
+Aggregation runs as a sequential stream and does not load every event into memory simultaneously. Numeric aggregation skips missing values, booleans, and nonnumeric content. Every operation except `count` requires a numeric value path.
 
-### F4. 数据保留和文件压缩
+### F4. Data Retention and File Compaction
 
-用户可以重写 segment 文件，也可以给出保留时间点，删除更早的事件。保留下来的事件内容、ID 和顺序不变，操作会返回前后事件数量和文件字节数。
+Users can rewrite segment files and optionally provide a retention timestamp that discards older events. Retained event contents, IDs, and order remain unchanged. The operation reports event counts and file sizes before and after compaction.
 
-压缩期间会阻塞写入。当前版本不提供多机复制，也不承诺读取与压缩并发时的数据库级快照一致性。
+Compaction blocks writers while it runs. The current release does not provide multi-node replication and does not guarantee database-level snapshot consistency between concurrent readers and compaction.
 
-### F5. 本地命令行工作流
+### F5. Local Command-Line Workflow
 
-命令行提供 `init`、`append`、`query`、`aggregate`、`compact`、`recover` 和 `stats`。输入使用 JSON Lines，输出使用 JSON，方便不同 Agent 或脚本接入。
+The command-line interface provides `init`, `append`, `query`, `aggregate`, `compact`, `recover`, and `stats`. Events are accepted as JSON Lines, and commands return JSON so different agents and scripts can integrate without custom parsing.
 
-无效 JSON 会报告行号，失败命令以非零状态退出。核心路径完全在本地运行，不需要网络、账号、付费 API、GPU 或模型权重。
+Invalid JSON reports its source line number, and failed commands exit with a nonzero status. The core workflow runs locally without a network connection, account, paid API, GPU, or model weights.
 
-## 下一阶段功能
+## Next-stage Features
 
-这些是已经确定的产品方向，但不属于当前版本已经完成的核心功能：
+The following product directions are defined but are not current, implemented core features:
 
-1. 定义 Agent 会话、消息、工具调用、文件修改、测试结果和 Git commit 的标准事件结构。
-2. 支持跨 Agent、跨对话和跨项目导入，并保留来源信息。
-3. 按项目和主题查询，增加离线关键词、拼写近似和相关度排序组成的混合搜索。
-4. 导入时自动识别常见 token、邮箱和本机路径，脱敏后再保存。
-5. 将一次需求、多个对话、代码 commits 和测试结果串成可回放的工作链路。
+1. Define standard event structures for agent sessions, messages, tool calls, file modifications, test results, and Git commits.
+2. Import records across agents, conversations, and projects while preserving source metadata.
+3. Query by project and topic with offline hybrid search combining keywords, spelling similarity, and relevance ranking.
+4. Detect common tokens, email addresses, and local machine paths during import and redact them before storage.
+5. Connect one requirement, multiple conversations, code commits, and test results into a replayable work trail.
 
-每项进入“当前核心功能”之前，都必须有对应实现、正确性测试和适用的性能测试。
+Before any item moves into the current core feature set, it must have a corresponding implementation, correctness tests, and applicable performance measurements.
 
-## 基本架构
+## Architecture
 
-`models.py` 定义事件结构和输入边界。`codec.py` 把事件编码成带 CRC 的紧凑 JSON 帧。`storage.py` 管理目录、写锁、segment 滚动、顺序读取和恢复。`query.py` 执行过滤和游标分页。`aggregate.py` 执行流式分组统计。`lifecycle.py` 负责保留与压缩。`cli.py` 解析命令行输入并调用相同的库接口。
+`models.py` defines the event structure and input boundaries. `codec.py` encodes events into compact JSON frames with CRC checksums. `storage.py` manages directories, write locking, segment rotation, sequential reads, and recovery. `query.py` applies filters and cursor pagination. `aggregate.py` performs streaming grouped aggregation. `lifecycle.py` manages retention and compaction. `cli.py` parses command-line input and calls the same library interfaces.
 
-写入数据流是：Agent 或导入器 → 事件验证 → JSON 帧编码 → 文件锁 → segment 文件。读取数据流是：segment 文件 → CRC 与 JSON 解码 → 条件过滤 → 分页或聚合。
+The write path is: agent or importer → event validation → JSON frame encoding → file lock → segment file. The read path is: segment file → CRC and JSON decoding → conditional filtering → pagination or aggregation.
 
-系统当前以单个 Python 进程运行。不同进程可以并发提交写入，文件锁防止帧相互穿插。它不是网络数据库，也没有后台服务。
+The system currently runs as a single Python process. Multiple processes may submit writes concurrently, and a file lock prevents their frames from interleaving. Segmenta is not a network database and has no background service.
 
-## 测试和性能
+## Testing and Performance
 
-F1–F5 的正确性测试与性能测试映射在 `tests/FEATURE_MAP.md`。完整正确性测试通过 `./scripts/verify.sh` 运行，干净虚拟环境安装通过 `./scripts/clean_verify.sh` 验证。
+The correctness and performance test mapping for F1–F5 is documented in `tests/FEATURE_MAP.md`. Run the complete correctness suite with `./scripts/verify.sh`. Validate installation in a clean virtual environment with `./scripts/clean_verify.sh`.
 
-性能测试通过 `./scripts/bench.sh` 输出平均值、p50、p95、p99、吞吐量和跟踪内存，不设置武断的二元延迟门槛。当前主要性能问题是批量追加会同时保留事件对象和编码帧，内存随批次规模增长；查询和聚合仍然扫描并解码全部相关 segment，后续可以通过临时 spool、segment 元数据和稀疏索引优化。
+Run performance measurements with `./scripts/bench.sh`. The benchmark reports mean, p50, p95, and p99 latency, throughput, and traced memory without imposing an arbitrary binary latency threshold. The primary current limitation is that batch append holds both event objects and encoded frames, causing memory to grow with batch size. Queries and aggregations still scan and decode every relevant segment. Future optimization options include a temporary spool, segment metadata, and sparse indexes.
 
-## 如何运行
+## Running the Project
 
 ```bash
 python3 -m venv .venv
@@ -83,6 +83,6 @@ python3 -m venv .venv
 ./scripts/bench.sh --sizes 10000 50000 100000 --repeats 5
 ```
 
-## 不做什么
+## Out of Scope
 
-当前版本不提供网络 API、SQL、用户认证、多机复制、加密存储、云备份或任意自然语言语义理解。CRC 用于发现意外损坏，不用于防止恶意篡改。自动脱敏尚未实现，因此在导入真实私人数据前必须先在数据源侧完成脱敏。
+The current release does not provide a network API, SQL, user authentication, multi-node replication, encrypted storage, cloud backup, or general natural-language semantic understanding. CRC checks detect accidental corruption; they do not prevent malicious tampering. Automatic redaction is not implemented yet, so private source data must be redacted before import.
