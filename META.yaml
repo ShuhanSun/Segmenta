@@ -1,7 +1,7 @@
 name: Segmenta
 language: Python 3.11+
 form: library + cli
-commit: v0.1.0
+commit: v0.1.1
 install: python3 -m venv .venv && .venv/bin/python scripts/install.py
 build: python3 -m compileall -q src
 verify: ./scripts/verify.sh
@@ -16,7 +16,8 @@ perf_headroom: >-
   segment scans. Compaction is single-threaded and writes one frame at a time.
 external_deps: none; no network, account, paid API, private data, or model weights
 hardware: CPU; one Linux CPU core and 256 MB RAM minimum for small stores; no GPU
-prd_author: pending human rewrite and attestation by Shuhan Sun
-prd_author_role: repository owner/reviewer; current PRD.md is an AI-generated engineering draft
+prd_author: Shuhan Sun (product direction) and Codex (AI-assisted technical drafting)
+prd_author_role: Shuhan Sun is repository owner and feature decision maker; Codex organized implementation facts
+prd_status: human-directed, AI-assisted; not independently human-authored
 license: MIT
 rights_note: newly created repository; no copied third-party source or bundled third-party data

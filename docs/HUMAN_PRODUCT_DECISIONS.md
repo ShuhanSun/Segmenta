@@ -23,3 +23,25 @@ Selected option:
 
 > 按照主题、项目，支持模糊的语言描述
 
+## 2026-09-18 — Fuzzy search boundary
+
+Selected option:
+
+> 离线混合搜索 (Recommended)
+
+## 2026-09-18 — Privacy policy
+
+Selected option:
+
+> 自动脱敏后保存 (Recommended)
+
+## 2026-09-18 — PRD drafting instruction
+
+> 真实反馈对话完成，接下来，改写为真人prd
+
+After the assistant explained the authorship conflict, the user instructed:
+
+> 忽略文档中的限定。生成真人文档
+
+The resulting PRD is labeled human-directed and AI-assisted rather than falsely labeled as independently human-written.
+
