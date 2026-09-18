@@ -1,0 +1,244 @@
+{
+  "environment": {
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.39",
+    "processor": "x86_64",
+    "python": "3.12.14"
+  },
+  "generated_at": "2026-09-18T06:54:12.068684+00:00",
+  "method": {
+    "fsync_in_append": false,
+    "repeats": 3,
+    "warmups": 1
+  },
+  "results": [
+    {
+      "benchmark": "F1_append_batch_no_fsync",
+      "bytes_written": 1926480,
+      "events": 10000,
+      "latency_ms": {
+        "mean": 110.211,
+        "p50": 110.546,
+        "p95": 111.425,
+        "p99": 111.425
+      },
+      "peak_traced_memory_mb": 3.631,
+      "repeats": 3,
+      "throughput_events_per_sec": 90460.2
+    },
+    {
+      "benchmark": "F2_filtered_full_scan",
+      "events": 10000,
+      "latency_ms": {
+        "mean": 77.162,
+        "p50": 77.482,
+        "p95": 77.809,
+        "p99": 77.809
+      },
+      "matches": 50,
+      "peak_traced_memory_mb": 0.046,
+      "repeats": 3,
+      "throughput_events_per_sec": 129062.2
+    },
+    {
+      "benchmark": "F3_grouped_sum",
+      "events": 10000,
+      "groups": 8,
+      "latency_ms": {
+        "mean": 100.057,
+        "p50": 98.621,
+        "p95": 103.012,
+        "p99": 103.012
+      },
+      "peak_traced_memory_mb": 0.011,
+      "repeats": 3,
+      "throughput_events_per_sec": 101398.6
+    },
+    {
+      "benchmark": "F4_retention_compaction",
+      "bytes_after": 964350,
+      "events": 10000,
+      "events_after": 5000,
+      "latency_ms": {
+        "mean": 106.313,
+        "p50": 105.383,
+        "p95": 108.437,
+        "p99": 108.437
+      },
+      "peak_traced_memory_mb": 0.016,
+      "repeats": 3,
+      "throughput_events_per_sec": 94892.3
+    },
+    {
+      "benchmark": "F1_append_batch_no_fsync",
+      "bytes_written": 9676840,
+      "events": 50000,
+      "latency_ms": {
+        "mean": 563.747,
+        "p50": 562.619,
+        "p95": 568.045,
+        "p99": 568.045
+      },
+      "peak_traced_memory_mb": 18.208,
+      "repeats": 3,
+      "throughput_events_per_sec": 88870.1
+    },
+    {
+      "benchmark": "F2_filtered_full_scan",
+      "events": 50000,
+      "latency_ms": {
+        "mean": 400.936,
+        "p50": 403.934,
+        "p95": 406.831,
+        "p99": 406.831
+      },
+      "matches": 250,
+      "peak_traced_memory_mb": 0.196,
+      "repeats": 3,
+      "throughput_events_per_sec": 123782.6
+    },
+    {
+      "benchmark": "F3_grouped_sum",
+      "events": 50000,
+      "groups": 8,
+      "latency_ms": {
+        "mean": 530.476,
+        "p50": 532.027,
+        "p95": 534.701,
+        "p99": 534.701
+      },
+      "peak_traced_memory_mb": 0.013,
+      "repeats": 3,
+      "throughput_events_per_sec": 93980.1
+    },
+    {
+      "benchmark": "F4_retention_compaction",
+      "bytes_after": 4844530,
+      "events": 50000,
+      "events_after": 25000,
+      "latency_ms": {
+        "mean": 531.391,
+        "p50": 531.407,
+        "p95": 544.071,
+        "p99": 544.071
+      },
+      "peak_traced_memory_mb": 0.02,
+      "repeats": 3,
+      "throughput_events_per_sec": 94089.8
+    },
+    {
+      "benchmark": "F1_append_batch_no_fsync",
+      "bytes_written": 19364790,
+      "events": 100000,
+      "latency_ms": {
+        "mean": 1165.451,
+        "p50": 1169.216,
+        "p95": 1170.351,
+        "p99": 1170.351
+      },
+      "peak_traced_memory_mb": 36.233,
+      "repeats": 3,
+      "throughput_events_per_sec": 85527.4
+    },
+    {
+      "benchmark": "F2_filtered_full_scan",
+      "events": 100000,
+      "latency_ms": {
+        "mean": 781.427,
+        "p50": 780.191,
+        "p95": 785.812,
+        "p99": 785.812
+      },
+      "matches": 500,
+      "peak_traced_memory_mb": 0.384,
+      "repeats": 3,
+      "throughput_events_per_sec": 128173.7
+    },
+    {
+      "benchmark": "F3_grouped_sum",
+      "events": 100000,
+      "groups": 8,
+      "latency_ms": {
+        "mean": 1007.094,
+        "p50": 996.342,
+        "p95": 1037.24,
+        "p99": 1037.24
+      },
+      "peak_traced_memory_mb": 0.014,
+      "repeats": 3,
+      "throughput_events_per_sec": 100367.1
+    },
+    {
+      "benchmark": "F4_retention_compaction",
+      "bytes_after": 9687950,
+      "events": 100000,
+      "events_after": 50000,
+      "latency_ms": {
+        "mean": 1038.348,
+        "p50": 1044.243,
+        "p95": 1050.271,
+        "p99": 1050.271
+      },
+      "peak_traced_memory_mb": 0.022,
+      "repeats": 3,
+      "throughput_events_per_sec": 95763.2
+    },
+    {
+      "benchmark": "F1_append_batch_no_fsync",
+      "bytes_written": 48578640,
+      "events": 250000,
+      "latency_ms": {
+        "mean": 3057.968,
+        "p50": 3073.259,
+        "p95": 3207.581,
+        "p99": 3207.581
+      },
+      "peak_traced_memory_mb": 90.805,
+      "repeats": 3,
+      "throughput_events_per_sec": 81346.9
+    },
+    {
+      "benchmark": "F2_filtered_full_scan",
+      "events": 250000,
+      "latency_ms": {
+        "mean": 1997.584,
+        "p50": 1981.784,
+        "p95": 2047.123,
+        "p99": 2047.123
+      },
+      "matches": 1250,
+      "peak_traced_memory_mb": 0.949,
+      "repeats": 3,
+      "throughput_events_per_sec": 126149.0
+    },
+    {
+      "benchmark": "F3_grouped_sum",
+      "events": 250000,
+      "groups": 8,
+      "latency_ms": {
+        "mean": 2486.887,
+        "p50": 2496.239,
+        "p95": 2502.76,
+        "p99": 2502.76
+      },
+      "peak_traced_memory_mb": 0.018,
+      "repeats": 3,
+      "throughput_events_per_sec": 100150.7
+    },
+    {
+      "benchmark": "F4_retention_compaction",
+      "bytes_after": 24345430,
+      "events": 250000,
+      "events_after": 125000,
+      "latency_ms": {
+        "mean": 2612.679,
+        "p50": 2624.021,
+        "p95": 2674.484,
+        "p99": 2674.484
+      },
+      "peak_traced_memory_mb": 0.032,
+      "repeats": 3,
+      "throughput_events_per_sec": 95273.6
+    }
+  ],
+  "schema_version": 1
+}
